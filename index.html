@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111019" />
+    <title>Numeon — Scientific Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Numeon home">
+          <span class="brand-mark">N</span>
+          <span class="brand-name"
+            >numeon<span class="brand-dot">.</span
+            ><small>SCIENTIFIC CALCULATOR</small></span
+          >
+        </a>
+        <div class="topbar-actions">
+          <span class="status"><span class="status-dot"></span> READY</span>
+          <button
+            class="icon-button"
+            type="button"
+            data-action="toggle-theme"
+            aria-label="Toggle light and dark theme"
+            title="Toggle theme"
+          >
+            ☼
+          </button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <section class="calculator-panel panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">PRECISION WORKSPACE</p>
+              <h1>Calculator</h1>
+            </div>
+            <div class="mode-switch" aria-label="Angle mode">
+              <button
+                class="mode-button active"
+                type="button"
+                data-action="angle-mode"
+                data-value="DEG"
+                aria-pressed="true"
+              >
+                DEG
+              </button>
+              <button
+                class="mode-button"
+                type="button"
+                data-action="angle-mode"
+                data-value="RAD"
+                aria-pressed="false"
+              >
+                RAD
+              </button>
+            </div>
+          </div>
+
+          <div class="display" aria-label="Calculator display">
+            <div class="display-meta">
+              <span
+                id="memory-indicator"
+                class="memory-indicator"
+                aria-live="polite"
+                >M</span
+              >
+              <span id="previous-calculation" class="previous-calculation"
+                >Ready for your next calculation</span
+              >
+            </div>
+            <div id="expression" class="expression" aria-live="polite">0</div>
+            <div id="result" class="result" aria-live="polite">0</div>
+          </div>
+
+          <div class="keypad-section">
+            <div class="section-label">
+              <span>SCIENTIFIC</span><span class="section-line"></span>
+            </div>
+            <div class="key-grid scientific-grid">
+              <button
+                class="key function"
+                data-action="function"
+                data-value="sin"
+                type="button"
+              >
+                sin
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="cos"
+                type="button"
+              >
+                cos
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="tan"
+                type="button"
+              >
+                tan
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="log"
+                type="button"
+              >
+                log
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="ln"
+                type="button"
+              >
+                ln
+              </button>
+
+              <button
+                class="key function"
+                data-action="function"
+                data-value="asin"
+                type="button"
+              >
+                sin⁻¹
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="acos"
+                type="button"
+              >
+                cos⁻¹
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="atan"
+                type="button"
+              >
+                tan⁻¹
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="sqrt"
+                type="button"
+              >
+                √x
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="cbrt"
+                type="button"
+              >
+                ∛x
+              </button>
+
+              <button
+                class="key function"
+                data-action="constant"
+                data-value="pi"
+                type="button"
+              >
+                π
+              </button>
+              <button
+                class="key function"
+                data-action="constant"
+                data-value="e"
+                type="button"
+              >
+                e
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="square"
+                type="button"
+              >
+                x²
+              </button>
+              <button
+                class="key function"
+                data-action="operator"
+                data-value="^"
+                type="button"
+              >
+                xʸ
+              </button>
+              <button
+                class="key function"
+                data-action="function"
+                data-value="factorial"
+                type="button"
+              >
+                n!
+              </button>
+            </div>
+          </div>
+
+          <div class="keypad-section">
+            <div class="section-label">
+              <span>MEMORY & CONTROLS</span><span class="section-line"></span>
+            </div>
+            <div class="key-grid memory-grid">
+              <button
+                class="key utility"
+                data-action="memory"
+                data-value="MC"
+                type="button"
+              >
+                MC
+              </button>
+              <button
+                class="key utility"
+                data-action="memory"
+                data-value="MR"
+                type="button"
+              >
+                MR
+              </button>
+              <button
+                class="key utility"
+                data-action="memory"
+                data-value="M+"
+                type="button"
+              >
+                M+
+              </button>
+              <button
+                class="key utility"
+                data-action="memory"
+                data-value="M-"
+                type="button"
+              >
+                M−
+              </button>
+              <button
+                class="key utility"
+                data-action="memory"
+                data-value="MS"
+                type="button"
+              >
+                MS
+              </button>
+            </div>
+          </div>
+
+          <div class="keypad-section main-keypad-section">
+            <div class="section-label">
+              <span>KEYPAD</span><span class="section-line"></span>
+            </div>
+            <div class="key-grid main-grid">
+              <button class="key utility" data-action="clear" type="button">
+                AC
+              </button>
+              <button class="key utility" data-action="delete" type="button">
+                DEL
+              </button>
+              <button
+                class="key utility"
+                data-action="parenthesis"
+                data-value="("
+                type="button"
+              >
+                (
+              </button>
+              <button
+                class="key operator"
+                data-action="operator"
+                data-value="/"
+                type="button"
+              >
+                ÷
+              </button>
+
+              <button
+                class="key number"
+                data-action="number"
+                data-value="7"
+                type="button"
+              >
+                7
+              </button>
+              <button
+                class="key number"
+                data-action="number"
+                data-value="8"
+                type="button"
+              >
+                8
+              </button>
+              <button
+                class="key number"
+                data-action="number"
+                data-value="9"
+                type="button"
+              >
+                9
+              </button>
+              <button
+                class="key operator"
+                data-action="operator"
+                data-value="*"
+                type="button"
+              >
+                ×
+              </button>
+
+              <button
+                class="key number"
+                data-action="number"
+                data-value="4"
+                type="button"
+              >
+                4
+              </button>
+              <button
+                class="key number"
+                data-action="number"
+                data-value="5"
+                type="button"
+              >
+                5
+              </button>
+              <button
+                class="key number"
+                data-action="number"
+                data-value="6"
+                type="button"
+              >
+                6
+              </button>
+              <button
+                class="key operator"
+                data-action="operator"
+                data-value="-"
+                type="button"
+              >
+                −
+              </button>
+
+              <button
+                class="key number"
+                data-action="number"
+                data-value="1"
+                type="button"
+              >
+                1
+              </button>
+              <button
+                class="key number"
+                data-action="number"
+                data-value="2"
+                type="button"
+              >
+                2
+              </button>
+              <button
+                class="key number"
+                data-action="number"
+                data-value="3"
+                type="button"
+              >
+                3
+              </button>
+              <button
+                class="key operator"
+                data-action="operator"
+                data-value="+"
+                type="button"
+              >
+                +
+              </button>
+
+              <button class="key utility" data-action="sign" type="button">
+                +/−
+              </button>
+              <button
+                class="key number"
+                data-action="number"
+                data-value="0"
+                type="button"
+              >
+                0
+              </button>
+              <button class="key number" data-action="decimal" type="button">
+                .
+              </button>
+              <button class="key equals" data-action="equals" type="button">
+                =
+              </button>
+            </div>
+          </div>
+          <p class="keyboard-hint">
+            KEYBOARD ENABLED <span>·</span> Enter = Calculate <span>·</span> Esc
+            = Clear
+          </p>
+        </section>
+
+        <aside class="side-column">
+          <section class="side-card panel">
+            <div class="side-heading">
+              <div>
+                <p class="eyebrow">YOUR ACTIVITY</p>
+                <h2>History</h2>
+              </div>
+              <button
+                class="text-button"
+                type="button"
+                data-action="clear-history"
+              >
+                Clear all
+              </button>
+            </div>
+            <div id="history-list" class="history-list" aria-live="polite">
+              <div class="empty-state">
+                <span class="empty-icon">↗</span>
+                <p>Your calculations will<br />appear here.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="side-card memory-card panel">
+            <p class="eyebrow">QUICK REFERENCE</p>
+            <h2>Memory register</h2>
+            <div class="memory-value" id="memory-value">0</div>
+            <p class="muted-copy">Store a value with MS, recall it with MR.</p>
+          </section>
+
+          <section class="tip-card">
+            <span class="tip-icon">✦</span>
+            <div>
+              <strong>A little precision goes a long way.</strong>
+              <p>
+                Use DEG for degrees and RAD for radians when working with
+                trigonometry.
+              </p>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="footer">
+        <span>NUMEON <span class="brand-dot">·</span> BUILT FOR CLARITY</span>
+        <span
+          >SCIENTIFIC CALCULATOR <span class="footer-divider">/</span> V
+          1.0</span
+        >
+      </footer>
+    </main>
+  </body>
+</html>

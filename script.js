@@ -497,6 +497,7 @@ function calculateExpression() {
     }
 
     calculator.result = String(stack[0]);
+    saveToHistory(calculator.expression, calculator.result);
     resultDisplay.textContent = calculator.result;
 
     calculator.isResultDisplayed = true;
@@ -733,19 +734,52 @@ function insertConstant(name) {
 ========================================= */
 
 function saveToHistory(expression, result) {
-  // TODO
+  const historyItem = {
+    expression: expression,
+    result: result,
+    id: Date.now(),
+  };
+
+  calculator.history.unshift(historyItem);
+
+  renderHistory();
 }
 
 function renderHistory() {
-  // TODO
+  historyList.innerHTML = "";
+
+  calculator.history.forEach((item) => {
+    const historyItem = document.createElement("div");
+    historyItem.classList.add("history-item");
+
+    const expression = document.createElement("div");
+    expression.classList.add("history-expression");
+    expression.textContent = item.expression;
+
+    const result = document.createElement("div");
+    result.classList.add("history-result");
+    result.textContent = formatResult(Number(item.result));
+
+    historyItem.append(expression, result);
+    historyItem.addEventListener("click", () => {
+      reuseHistoryResult(item.result);
+    });
+    historyList.appendChild(historyItem);
+  });
 }
 
 function reuseHistoryResult(result) {
-  // TODO
+  calculator.expression = String(result);
+  calculator.result = "";
+  calculator.isResultDisplayed = false;
+
+  updateExpressionDisplay();
+  updateResultDisplay();
 }
 
 function clearHistory() {
-  // TODO
+  calculator.history = [];
+  renderHistory();
 }
 
 /* 10. MEMORY
@@ -825,6 +859,15 @@ function handleButtonClick(event) {
 }
 
 keypad.addEventListener("click", handleButtonClick);
+
+const historyPanel = document.querySelector(".side-card.panel");
+historyPanel.addEventListener("click", (event) => {
+  const button = event.target.closest('[data-action="clear-history"]');
+
+  if (!button || !historyPanel.contains(button)) return;
+
+  clearHistory();
+});
 
 /* 13. KEYBOARD SUPPORT
 ========================================= */

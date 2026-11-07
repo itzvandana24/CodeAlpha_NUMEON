@@ -1,82 +1,92 @@
 # NUMEON — Scientific Calculator
 
-A modern, responsive scientific calculator interface designed with a clean dark aesthetic and neon-green accents.
+NUMEON is a responsive, browser-based scientific calculator built with **HTML, CSS, and JavaScript**. It combines essential arithmetic operations with scientific functions, calculation history, memory operations, keyboard support, and a dark/light theme switch in a clean, modern interface.
 
-NUMEON is a frontend development project built as part of the CodeAlpha Frontend Development Internship. The project is being developed incrementally, starting with the user interface and progressing towards a fully functional scientific calculator.
+## Features
 
-## 🚀 Version 1.0 — Frontend UI
+### Core Calculator
+- Basic arithmetic: addition, subtraction, multiplication, and division.
+- Expression evaluation with operator precedence.
+- Parentheses and nested expressions.
+- Decimal number support.
+- Delete and clear operations.
 
-The first version focuses on the visual foundation, layout, and responsive behaviour of the calculator.
+### Scientific Operations
+- Trigonometric functions: `sin`, `cos`, and `tan`.
+- Inverse trigonometric functions: `asin`, `acos`, and `atan`.
+- Logarithmic functions: `log` and `ln`.
+- Square root and cube root.
+- Square and factorial operations.
+- Mathematical constants: π and e.
+- Degree (DEG) and Radian (RAD) angle modes.
 
-### Features
+### Calculation History
+- View previous calculations and their results.
+- Select a previous result to reuse it.
+- Clear the calculation history.
 
-- Modern dark charcoal and neon-green interface.
-- Scientific calculator layout.
-- Basic arithmetic and scientific function buttons.
-- Dedicated calculation display.
-- Calculation history panel UI.
-- Responsive layout for:
-  - Small mobile screens
-  - Smartphones
-  - Foldable devices
-  - Tablets (vertical layout)
-  - Desktop and wider screens
-- Consistent spacing and adaptable keypad layout.
+### Memory Functions
+- `MS` — Store the current result.
+- `MR` — Recall the stored value.
+- `M+` — Add the current result to memory.
+- `M-` — Subtract the current result from memory.
+- `MC` — Clear the memory register.
 
-**Note:** Calculator operations, keyboard interactions, history functionality, and scientific calculations are not implemented yet. These will be added in upcoming versions using JavaScript.
+### Additional Features
+- Keyboard input support.
+- Dark and light theme switching.
+- Responsive layout for desktop, tablet, and mobile screens.
+- Formatted calculation results.
 
-## 🛠️ Tech Stack
+## Keyboard Shortcuts
 
-- HTML5 — Semantic structure
-- CSS3 — Styling, Grid, Flexbox, and responsive media queries
-- JavaScript — Planned for calculator functionality
+| Key | Action |
+|---|---|
+| `0–9` | Enter numbers |
+| `+ - * / ^` | Enter operators |
+| `.` | Enter decimal point |
+| `(` and `)` | Insert parentheses |
+| `Enter` or `=` | Calculate |
+| `Backspace` | Delete the last character |
+| `Escape` | Clear the calculator |
 
-## 📁 Project Structure
+## Technologies Used
+
+- **HTML5** — Calculator structure and interface.
+- **CSS3** — Styling, responsive layout, and themes.
+- **JavaScript** — Expression parsing, calculation logic, scientific operations, history, memory, and keyboard interactions.
+
+## Getting Started
+
+1. Clone this repository:
+
+   ```bash
+   git clone YOUR_REPOSITORY_URL
+   ```
+
+2. Open the project folder.
+3. Open `index.html` in your browser.
+
+No additional dependencies or installation steps are required.
+
+## Project Structure
 
 ```text
-CodeAlpha_NUMEON/
-│
+NUMEON/
 ├── index.html
 ├── styles.css
 ├── script.js
 └── README.md
 ```
 
-## 💻 Getting Started
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/YOUR_USERNAME/CodeAlpha_NUMEON.git
-```
-
-2. Open the project folder.
-3. Open `index.html` in your browser, or use the VS Code Live Server extension.
-
-## 🗺️ Development Roadmap
-
-- [x] Version 1.0 — HTML and CSS interface
-- [x] Responsive layouts
-- [ ] DOM selection and event handling
-- [ ] Basic arithmetic operations
-- [ ] Scientific calculations
-- [ ] DEG/RAD mode
-- [ ] Factorial and advanced functions
-- [ ] Calculation history
-- [ ] Keyboard support
-- [ ] Error handling and precision improvements
-
-## 👩‍💻 Author
-
-**Vandana Tyagi**
-
-B.Tech Computer Science Engineering Student
-
-## 📌 Internship
+## Internship Project
 
 Developed as part of the **CodeAlpha Frontend Development Internship**.
 
+## Author
+
+**Vandana Tyagi**
+
 ---
 
-*NUMEON — Precision meets simplicity.*
-
+*NUMEON — Calculate with clarity.*

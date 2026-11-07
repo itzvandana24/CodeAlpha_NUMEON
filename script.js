@@ -48,6 +48,9 @@ function resetCalculator() {
   resultDisplay.textContent = "";
 }
 
+function updateMemoryDisplay() {
+  memoryValueDisplay.textContent = formatResult(calculator.memory);
+}
 /* 4. INPUT FUNCTIONS
 ========================================= */
 
@@ -786,7 +789,42 @@ function clearHistory() {
 ========================================= */
 
 function handleMemory(action) {
-  // TODO: MC, MR, M+, M-, MS
+  const currentResult = Number(calculator.result);
+
+  if (action === "MS") {
+    if (calculator.result === "" || !Number.isFinite(currentResult)) {
+      return;
+    }
+
+    calculator.memory = currentResult;
+  } else if (action === "MR") {
+    calculator.expression = String(calculator.memory);
+    calculator.result = "";
+    calculator.isResultDisplayed = false;
+
+    updateExpressionDisplay();
+    updateResultDisplay();
+  } else if (action === "M+") {
+    const currentResult = Number(calculator.result);
+
+    if (calculator.result === "" || !Number.isFinite(currentResult)) {
+      return;
+    }
+
+    calculator.memory += currentResult;
+  } else if (action === "M-") {
+    const currentResult = Number(calculator.result);
+
+    if (calculator.result === "" || !Number.isFinite(currentResult)) {
+      return;
+    }
+
+    calculator.memory -= currentResult;
+  } else if (action === "MC") {
+    calculator.memory = 0;
+  }
+
+  updateMemoryDisplay();
 }
 
 /* 11. ERROR HANDLING
@@ -855,6 +893,9 @@ function handleButtonClick(event) {
         insertScientificFunction(value);
       }
       break;
+    case "memory":
+      handleMemory(value);
+      break;
   }
 }
 
@@ -872,7 +913,28 @@ historyPanel.addEventListener("click", (event) => {
 /* 13. KEYBOARD SUPPORT
 ========================================= */
 
-function handleKeyboardInput(event) {}
+function handleKeyboardInput(event) {
+  const key = event.key;
+
+  if (/^[0-9]$/.test(key)) {
+    appendNumber(key);
+  } else if (key === ".") {
+    appendDecimal();
+  } else if (["+", "-", "*", "/", "^"].includes(key)) {
+    appendOperator(key);
+  } else if (key === "(" || key === ")") {
+    appendParenthesis(key);
+  } else if (key === "Enter" || key === "=") {
+    event.preventDefault();
+    calculateExpression();
+  } else if (key === "Backspace") {
+    deleteLastCharacter();
+  } else if (key === "Escape") {
+    resetCalculator();
+  }
+}
+
+document.addEventListener("keydown", handleKeyboardInput);
 
 /* 14. THEME
 ========================================= */

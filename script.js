@@ -1,5 +1,4 @@
-/* 1. DOM SELECTION
-========================================= */
+/* DOM SELECTION */
 
 const expressionDisplay = document.querySelector("#expression");
 const resultDisplay = document.querySelector("#result");
@@ -13,8 +12,7 @@ const previousCalculation = document.querySelector("#previous-calculation");
 const memoryIndicator = document.querySelector("#memory-indicator");
 const memoryValueDisplay = document.querySelector("#memory-value");
 
-/* 2. CALCULATOR STATE
-========================================= */
+/* CALCULATOR STATE */
 
 const calculator = {
   expression: "0",
@@ -25,8 +23,7 @@ const calculator = {
   isResultDisplayed: false,
 };
 
-/* 3. DISPLAY FUNCTIONS
-========================================= */
+/* DISPLAY FUNCTIONS */
 
 function updateExpressionDisplay() {
   expressionDisplay.textContent = calculator.expression;
@@ -51,8 +48,7 @@ function resetCalculator() {
 function updateMemoryDisplay() {
   memoryValueDisplay.textContent = formatResult(calculator.memory);
 }
-/* 4. INPUT FUNCTIONS
-========================================= */
+/* INPUT FUNCTIONS */
 
 function appendNumber(number) {
   if (calculator.expression === "0") {
@@ -160,7 +156,7 @@ function appendPostfixOperator(operator) {
 
   updateExpressionDisplay();
 }
-/* 5. BASIC CALCULATION
+/* BASIC CALCULATION
 ========================================= */
 function validateExpression(expression) {
   if (!expression || !expression.trim()) return false;
@@ -558,8 +554,7 @@ function formatResult(value) {
   return Object.is(formattedValue, -0) ? "0" : String(formattedValue);
 }
 
-/* 6. SCIENTIFIC FUNCTIONS
-========================================= */
+/* SCIENTIFIC FUNCTIONS */
 
 function calculateScientificFunction(name, value) {
   switch (name) {
@@ -669,8 +664,7 @@ function insertScientificFunction(name) {
 
   updateExpressionDisplay();
 }
-/* 7. ANGLE MODE
-========================================= */
+/* ANGLE MODE */
 
 function setAngleMode(mode) {
   if (mode !== "DEG" && mode !== "RAD") {
@@ -733,8 +727,7 @@ function insertConstant(name) {
   updateExpressionDisplay();
 }
 
-/* 9. HISTORY
-========================================= */
+/* HISTORY */
 
 function saveToHistory(expression, result) {
   const historyItem = {
@@ -785,8 +778,7 @@ function clearHistory() {
   renderHistory();
 }
 
-/* 10. MEMORY
-========================================= */
+/* MEMORY */
 
 function handleMemory(action) {
   const currentResult = Number(calculator.result);
@@ -827,15 +819,13 @@ function handleMemory(action) {
   updateMemoryDisplay();
 }
 
-/* 11. ERROR HANDLING
-========================================= */
+/* ERROR HANDLING */
 
 function handleCalculationError(error) {
   // TODO
 }
 
-/* 12. BUTTON EVENT DELEGATION
-========================================= */
+/* BUTTON EVENT HANDLING */
 
 function handleButtonClick(event) {
   const button = event.target.closest("button");
@@ -910,8 +900,7 @@ historyPanel.addEventListener("click", (event) => {
   clearHistory();
 });
 
-/* 13. KEYBOARD SUPPORT
-========================================= */
+/* KEYBOARD SUPPORT */
 
 function handleKeyboardInput(event) {
   const key = event.key;
@@ -936,18 +925,14 @@ function handleKeyboardInput(event) {
 
 document.addEventListener("keydown", handleKeyboardInput);
 
-/* 14. THEME
-========================================= */
-
+/* THEME TOGGLE */
 function toggleTheme() {
-  // TODO
+  const currentTheme = document.body.dataset.theme || "dark";
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+  document.body.dataset.theme = newTheme;
 }
 
-/* 15. EVENT LISTENERS
-========================================= */
+const themeButton = document.querySelector('[data-action="toggle-theme"]');
 
-// TODO: Keypad click listener.
-
-// TODO: DEG/RAD button listeners.
-
-// TODO: Keyboard listener.
+themeButton.addEventListener("click", toggleTheme);

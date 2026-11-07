@@ -33,12 +33,15 @@ function updateExpressionDisplay() {
 }
 
 function updateResultDisplay() {
-  // TODO
+  resultDisplay.textContent = calculator.result
+    ? formatResult(Number(calculator.result))
+    : "";
 }
 
 function resetCalculator() {
   calculator.expression = "0";
   calculator.result = "";
+  updateResultDisplay();
   calculator.isResultDisplayed = false;
 
   updateExpressionDisplay();
@@ -143,132 +146,311 @@ function deleteLastCharacter() {
   updateExpressionDisplay();
 }
 
-/* 5. BASIC CALCULATION
-========================================= */
-function validateExpression(expression) {
-  expression = expression.trim();
-
-  // Reject empty expressions
-  if (!expression || expression === "0") {
-    return false;
-  }
-
-  // Reject expressions ending with an operator
-  if (/[+\-*/^.]$/.test(expression)) {
-    return false;
-  }
-
-  // Reject expressions starting with invalid operators
-  if (/^[+*/^]/.test(expression)) {
-    return false;
-  }
-
-  // Check balanced parentheses
-  let bracketCount = 0;
-
-  for (const char of expression) {
-    if (char === "(") {
-      bracketCount++;
-    } else if (char === ")") {
-      bracketCount--;
-
-      if (bracketCount < 0) {
-        return false;
-      }
-    }
-  }
-
-  if (bracketCount !== 0) {
-    return false;
-  }
-
-  return true;
-}
-
-function calculateExpression() {
-  if (!validateExpression(calculator.expression)) {
-    resultDisplay.textContent = "Invalid Expression";
+function appendPostfixOperator(operator) {
+  if (!calculator.expression || calculator.expression === "0") {
     return;
   }
 
-  const tokens = calculator.expression.match(
-    /(?:\d+(?:\.\d*)?|\.\d+)|[+\-*\/^()]/g,
-  );
-  // Converting Infix expression to Reverse Postfix Expression(Shunting Yard algo)
-  const output = [];
-  const operators = [];
+  calculator.expression += operator;
 
-  const precedence = {
-    "+": 1,
-    "-": 1,
-    "*": 2,
-    "/": 2,
-    "u-": 3,
-    "^": 4,
-  };
+  calculator.isResultDisplayed = false;
+
+  updateExpressionDisplay();
+}
+/* 5. BASIC CALCULATION
+========================================= */
+function validateExpression(expression) {
+  if (!expression || !expression.trim()) return false;
+
+  let tokens;
+
+  try {
+    tokens = tokenizeExpression(expression);
+  } catch (error) {
+    return false;
+  }
+
+  if (tokens.length === 0) return false;
+
+  const functions = [
+    "sin",
+    "cos",
+    "tan",
+    "asin",
+    "acos",
+    "atan",
+    "sqrt",
+    "cbrt",
+    "log",
+    "ln",
+  ];
+
+  const operators = ["+", "-", "*", "/", "^"];
+
+  let balance = 0;
+  let expectOperand = true;
+  let previousToken = null;
 
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
-    const previousToken = tokens[i - 1];
 
-    if (!isNaN(token)) {
-      output.push(Number(token));
-    } else if (token === "(") {
-      operators.push(token);
-    } else if (token === ")") {
-      while (operators.length > 0 && operators[operators.length - 1] !== "(") {
-        output.push(operators.pop());
-      }
+    const isNumber = /^\d+(\.\d*)?$/.test(token) || /^\.\d+$/.test(token);
 
-      operators.pop();
-    } else {
-      //handling -ve numbers like -3 unray -ve number
-      if (
-        token === "-" &&
-        (i === 0 ||
-          previousToken === "(" ||
-          ["+", "-", "*", "/", "^"].includes(previousToken))
-      ) {
-        operators.push("u-");
-        continue;
+    const isConstant = token === "pi" || token === "e";
+
+    // Scientific functions
+    if (functions.includes(token)) {
+      if (!expectOperand || tokens[i + 1] !== "(") {
+        return false;
       }
-      while (
-        operators.length > 0 &&
-        operators[operators.length - 1] !== "(" &&
-        (precedence[operators[operators.length - 1]] > precedence[token] ||
-          (precedence[operators[operators.length - 1]] === precedence[token] &&
-            token !== "^"))
-      ) {
-        output.push(operators.pop());
-      }
-      operators.push(token);
     }
-  }
 
-  while (operators.length > 0) {
-    output.push(operators.pop());
-  }
+    // Opening parenthesis
+    else if (token === "(") {
+      if (!expectOperand) return false;
 
-  // Evaluating the reverse postfix expression
-  const stack = [];
+      balance++;
+      expectOperand = true;
+    }
 
-  try {
-    for (const token of output) {
-      if (typeof token === "number") {
-        stack.push(token);
+    // Closing parenthesis
+    else if (token === ")") {
+      if (expectOperand || balance === 0) return false;
+
+      balance--;
+      expectOperand = false;
+    }
+
+    // Numbers and constants
+    else if (isNumber || isConstant) {
+      if (!expectOperand) return false;
+
+      expectOperand = false;
+    }
+
+    // Factorial
+    else if (token === "!") {
+      if (expectOperand || previousToken === "!") {
+        return false;
       }
 
+      expectOperand = false;
+    }
+
+    // Arithmetic operators
+    else if (operators.includes(token)) {
+      if (expectOperand) {
+        // Only unary minus is allowed here.
+        if (token !== "-") return false;
+      } else {
+        expectOperand = true;
+      }
+    } else {
+      return false;
+    }
+
+    previousToken = token;
+  }
+
+  return balance === 0 && !expectOperand;
+}
+
+function calculateExpression() {
+  try {
+    if (!validateExpression(calculator.expression)) {
+      throw new Error("Invalid Expression");
+    }
+
+    const tokens = tokenizeExpression(calculator.expression);
+
+    const output = [];
+    const operators = [];
+
+    const precedence = {
+      "+": 1,
+      "-": 1,
+      "*": 2,
+      "/": 2,
+      "u-": 3,
+      "^": 4,
+    };
+
+    const scientificFunctions = [
+      "sin",
+      "cos",
+      "tan",
+      "asin",
+      "acos",
+      "atan",
+      "sqrt",
+      "cbrt",
+      "log",
+      "ln",
+    ];
+
+    const isOperator = (token) => Object.hasOwn(precedence, token);
+
+    const isRightAssociative = (operator) =>
+      operator === "^" || operator === "u-";
+
+    // STEP 1: INFIX TO POSTFIX
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      const previousToken = tokens[i - 1];
+
+      // Numbers and constants
+      if (
+        /^\d+(\.\d*)?$/.test(token) ||
+        /^\.\d+$/.test(token) ||
+        token === "pi" ||
+        token === "e"
+      ) {
+        output.push(token);
+      }
+
+      // Scientific functions
+      else if (scientificFunctions.includes(token)) {
+        operators.push(token);
+      }
+
+      // Opening parenthesis
+      else if (token === "(") {
+        operators.push(token);
+      }
+
+      // Closing parenthesis
+      else if (token === ")") {
+        while (
+          operators.length > 0 &&
+          operators[operators.length - 1] !== "("
+        ) {
+          output.push(operators.pop());
+        }
+
+        if (operators.length === 0) {
+          throw new Error("Mismatched parentheses");
+        }
+
+        operators.pop();
+
+        // Pop scientific function after closing parenthesis
+        if (
+          operators.length > 0 &&
+          scientificFunctions.includes(operators[operators.length - 1])
+        ) {
+          output.push(operators.pop());
+        }
+      }
+
+      // Factorial (postfix unary operator)
+      else if (token === "!") {
+        output.push(token);
+      }
+
+      // Arithmetic operators
+      else if (["+", "-", "*", "/", "^"].includes(token)) {
+        let currentOperator = token;
+
+        // Detect unary minus
+        if (
+          token === "-" &&
+          (i === 0 || previousToken === "(" || isOperator(previousToken))
+        ) {
+          currentOperator = "u-";
+        }
+
+        // Unary minus should not pop an existing operator
+        if (currentOperator !== "u-") {
+          while (operators.length > 0) {
+            const top = operators[operators.length - 1];
+
+            if (!isOperator(top)) {
+              break;
+            }
+
+            const shouldPop =
+              precedence[top] > precedence[currentOperator] ||
+              (precedence[top] === precedence[currentOperator] &&
+                !isRightAssociative(currentOperator));
+
+            if (!shouldPop) {
+              break;
+            }
+
+            output.push(operators.pop());
+          }
+        }
+
+        operators.push(currentOperator);
+      } else {
+        throw new Error("Invalid expression token");
+      }
+    }
+
+    // Empty remaining operators
+    while (operators.length > 0) {
+      const operator = operators.pop();
+
+      if (operator === "(" || operator === ")") {
+        throw new Error("Mismatched parentheses");
+      }
+
+      output.push(operator);
+    }
+
+    console.log("Postfix:", output);
+
+    // STEP 2: EVALUATE POSTFIX EXPRESSION
+    const stack = [];
+
+    for (const token of output) {
+      // Numbers
+      if (/^\d+(\.\d*)?$/.test(token) || /^\.\d+$/.test(token)) {
+        stack.push(Number(token));
+      }
+
+      // Constants
+      else if (token === "pi") {
+        stack.push(Math.PI);
+      } else if (token === "e") {
+        stack.push(Math.E);
+      }
+
+      // Unary minus
       else if (token === "u-") {
         if (stack.length < 1) {
-          throw new Error("Invalid Expression");
+          throw new Error("Invalid expression");
         }
 
-        const number = stack.pop();
-        stack.push(-number);
+        stack.push(-stack.pop());
+      }
+
+      // Factorial
+      else if (token === "!") {
+        if (stack.length < 1) {
+          throw new Error("Invalid expression");
         }
+
+        const value = stack.pop();
+
+        stack.push(calculateScientificFunction("factorial", value));
+      }
+
+      // Scientific functions
+      else if (scientificFunctions.includes(token)) {
+        if (stack.length < 1) {
+          throw new Error("Invalid expression");
+        }
+
+        const value = stack.pop();
+
+        stack.push(calculateScientificFunction(token, value));
+      }
+
+      // Binary operators
       else {
         if (stack.length < 2) {
-          throw new Error("Invalid Expression");
+          throw new Error("Invalid expression");
         }
 
         const b = stack.pop();
@@ -293,59 +475,258 @@ function calculateExpression() {
             if (b === 0) {
               throw new Error("Cannot divide by zero");
             }
+
             result = a / b;
             break;
 
           case "^":
             result = Math.pow(a, b);
             break;
+
+          default:
+            throw new Error("Unknown operator");
         }
 
         stack.push(result);
       }
     }
 
+    // STEP 3: FINAL RESULT VALIDATION
     if (stack.length !== 1 || !Number.isFinite(stack[0])) {
-      throw new Error("Invalid Expression");
+      throw new Error("Invalid expression");
     }
 
     calculator.result = String(stack[0]);
     resultDisplay.textContent = calculator.result;
+
     calculator.isResultDisplayed = true;
+
+    updateResultDisplay();
   } catch (error) {
     resultDisplay.textContent = error.message;
+    console.error("Calculation error:", error);
   }
 }
 
+function tokenizeExpression(expression) {
+  const tokenPattern =
+    /(?:asin|acos|atan|sqrt|cbrt|sin|cos|tan|log|ln|pi|e|\d+(?:\.\d*)?|\.\d+|[+\-*\/^!()])/y;
+
+  const tokens = [];
+  let position = 0;
+
+  while (position < expression.length) {
+    // Ignore whitespace
+    if (/\s/.test(expression[position])) {
+      position++;
+      continue;
+    }
+
+    tokenPattern.lastIndex = position;
+
+    const match = tokenPattern.exec(expression);
+
+    if (!match) {
+      throw new Error(`Invalid character: ${expression[position]}`);
+    }
+
+    tokens.push(match[0]);
+    position = tokenPattern.lastIndex;
+  }
+
+  return tokens;
+}
+
 function formatResult(value) {
-  // TODO: Handle precision.
+  if (!Number.isFinite(value)) {
+    throw new Error("Invalid result");
+  }
+
+  // Remove tiny floating-point artifacts
+  if (Math.abs(value) < 1e-12) {
+    return "0";
+  }
+
+  // Round to 12 significant digits
+  const formattedValue = Number(value.toPrecision(12));
+
+  // Prevent negative zero
+  return Object.is(formattedValue, -0) ? "0" : String(formattedValue);
 }
 
 /* 6. SCIENTIFIC FUNCTIONS
 ========================================= */
 
-function calculateScientificFunction(name) {
-  // TODO: sin, cos, tan, asin, acos, atan
-  // TODO: sqrt, cbrt, square, factorial
-  // TODO: log, ln
+function calculateScientificFunction(name, value) {
+  switch (name) {
+    // Trigonometric functions
+    case "sin":
+      return Math.sin(convertAngle(value));
+
+    case "cos":
+      return Math.cos(convertAngle(value));
+
+    case "tan":
+      return Math.tan(convertAngle(value));
+
+    // Inverse trigonometric functions
+    case "asin":
+    case "acos":
+    case "atan": {
+      if ((name === "asin" || name === "acos") && (value < -1 || value > 1)) {
+        throw new Error("Input must be between -1 and 1");
+      }
+
+      const result = Math[name](value);
+
+      return calculator.angleMode === "DEG" ? (result * 180) / Math.PI : result;
+    }
+
+    // Logarithmic functions
+    case "log":
+      if (value <= 0) throw new Error("Input must be positive");
+      return Math.log10(value);
+
+    case "ln":
+      if (value <= 0) throw new Error("Input must be positive");
+      return Math.log(value);
+
+    // Root functions
+    case "sqrt":
+      if (value < 0) throw new Error("Invalid square root");
+      return Math.sqrt(value);
+
+    case "cbrt":
+      return Math.cbrt(value);
+
+    // Square
+    case "square":
+      return value ** 2;
+
+    // Factorial
+    case "factorial": {
+      if (!Number.isInteger(value) || value < 0) {
+        throw new Error("Factorial requires a non-negative integer");
+      }
+
+      if (value > 170) {
+        throw new Error("Result is too large");
+      }
+
+      let factorial = 1;
+
+      for (let i = 2; i <= value; i++) {
+        factorial *= i;
+      }
+
+      return factorial;
+    }
+
+    default:
+      throw new Error("Unknown scientific function");
+  }
 }
 
+function insertScientificFunction(name) {
+  const functions = [
+    "sin",
+    "cos",
+    "tan",
+    "asin",
+    "acos",
+    "atan",
+    "log",
+    "ln",
+    "sqrt",
+    "cbrt",
+  ];
+
+  if (!functions.includes(name)) {
+    return;
+  }
+
+  if (calculator.isResultDisplayed) {
+    calculator.expression = "0";
+    calculator.isResultDisplayed = false;
+  }
+
+  let expression = calculator.expression;
+
+  if (expression === "0") {
+    expression = "";
+  }
+
+  // Add multiplication if a number or closing parenthesis comes first
+  if (/[\d)]$/.test(expression)) {
+    expression += "*";
+  }
+
+  calculator.expression = expression + name + "(";
+
+  updateExpressionDisplay();
+}
 /* 7. ANGLE MODE
 ========================================= */
 
 function setAngleMode(mode) {
-  // TODO
+  if (mode !== "DEG" && mode !== "RAD") {
+    return;
+  }
+
+  calculator.angleMode = mode;
+
+  angleButtons.forEach((button) => {
+    const isActive = button.dataset.value === mode;
+
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
 }
 
 function convertAngle(value) {
-  // TODO
+  if (calculator.angleMode === "DEG") {
+    return (value * Math.PI) / 180;
+  }
+
+  return value;
 }
 
 /* 8. CONSTANTS
 ========================================= */
 
 function insertConstant(name) {
-  // TODO: pi and e
+  const constants = {
+    pi: "pi",
+    e: "e",
+  };
+
+  if (!constants[name]) {
+    return;
+  }
+
+  if (calculator.isResultDisplayed) {
+    calculator.expression = "0";
+    calculator.isResultDisplayed = false;
+  }
+
+  let expression = calculator.expression;
+
+  if (expression === "0") {
+    expression = "";
+  }
+
+  // Add implicit multiplication when needed
+  if (
+    /[\d)]$/.test(expression) ||
+    expression.endsWith("pi") ||
+    expression.endsWith("e")
+  ) {
+    expression += "*";
+  }
+
+  calculator.expression = expression + constants[name];
+
+  updateExpressionDisplay();
 }
 
 /* 9. HISTORY
@@ -398,23 +779,47 @@ function handleButtonClick(event) {
     case "number":
       appendNumber(value);
       break;
+
     case "operator":
       appendOperator(value);
       break;
+
     case "decimal":
       appendDecimal();
       break;
+
     case "parenthesis":
       appendParenthesis(value);
       break;
+
     case "delete":
       deleteLastCharacter();
       break;
+
     case "equals":
       calculateExpression();
       break;
+
     case "clear":
       resetCalculator();
+      break;
+
+    case "angle-mode":
+      setAngleMode(value);
+      break;
+
+    case "constant":
+      insertConstant(value);
+      break;
+
+    case "function":
+      if (value === "square") {
+        appendPostfixOperator("^2");
+      } else if (value === "factorial") {
+        appendPostfixOperator("!");
+      } else {
+        insertScientificFunction(value);
+      }
       break;
   }
 }
